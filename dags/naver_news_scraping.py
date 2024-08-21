@@ -22,7 +22,7 @@ def init_driver(**kwargs):
 
 # DAG 설정
 @dag(
-    dag_id="google_news_scraping",
+    dag_id="naver_news_scraping",
     schedule_interval="@daily",
     start_date=datetime(2023, 1, 1),
     default_args={
@@ -32,18 +32,22 @@ def init_driver(**kwargs):
     tags=["scraping", "selenium"],
     catchup=False
 )
-def google_news_etl():
+def naver_news_etl():
     
     # 뉴스 제목 추출
     @task
-    def scrape_google_news():
+    def scrape_naver_news():
         driver = init_driver()
 
         # 구글 뉴스 페이지 열기
-        driver.get('https://news.google.com')
-
+        driver.get('https://news.naver.com/')
+        news_data = []
         # 뉴스 제목 추출
-        titles = driver.find_elements_by_xpath("//a[@class='DY5T1d']")
+        titles =  []
+        for i in range(1, 6):
+            title = driver.find_elements_by_xpath(f'//*[@id="_SECTION_HEADLINE_LIST_rvr5l"]/li[{i}]/div/div/div[2]/a/strong')
+            titles.append(title)
+        
         news_data = []
         for title in titles:
             title_text = title.text
@@ -60,11 +64,11 @@ def google_news_etl():
     @task
     def save_results(news_data):
         # 뉴스 데이터를 파일로 저장 (예: CSV 파일로 저장)
-        with open('/tmp/google_news_titles.csv', 'w') as f:
+        with open('/tmp/naver_news_titles.csv', 'w') as f:
             f.write("Title, Link\n")
             for news in news_data:
                 f.write(f"{news['title']}, {news['link']}\n")
-        print("Results saved to /tmp/google_news_titles.csv")
+        print("Results saved to /tmp/naver_news_titles.csv")
 
     # 상위 10개 뉴스 출력
     @task
@@ -74,9 +78,9 @@ def google_news_etl():
             print(f"{i + 1}. Title: {news['title']}, Link: {news['link']}")
 
     # Task 연결
-    news_data = scrape_google_news()
+    news_data = scrape_naver_news()
     save_results(news_data)
     output_top_10(news_data)
 
 # DAG 인스턴스 생성
-dag_instance = google_news_etl()
+dag_instance = naver_news_etl()
