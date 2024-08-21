@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.decorators import dag, task
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 # WebDriver 초기화 함수
 def init_driver(**kwargs):
@@ -45,7 +46,7 @@ def naver_news_etl():
         # 뉴스 제목 추출
         titles =  []
         for i in range(1, 6):
-            title = driver.find_elements_by_xpath(f'//*[@id="_SECTION_HEADLINE_LIST_rvr5l"]/li[{i}]/div/div/div[2]/a/strong')
+            title = driver.find_elements(By.XPATH, f'//*[@id="_SECTION_HEADLINE_LIST_rvr5l"]/li[{i}]/div/div/div[2]/a/strong')
             titles.append(title)
         
         news_data = []
