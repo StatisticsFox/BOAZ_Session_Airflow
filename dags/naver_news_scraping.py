@@ -16,8 +16,8 @@ def init_driver(**kwargs):
     # remote_chromedriver 컨테이너에 연결
     remote_webdriver = 'http://remote_chromedriver:4444/wd/hub'
     driver = webdriver.Remote(remote_webdriver, options=options)
-    driver.set_page_load_timeout(60)  # 페이지 로드 타임아웃 설정 (60초)
-    driver.implicitly_wait(30)  # 암묵적 대기 설정 (30초)
+    driver.set_page_load_timeout(120)  # 페이지 로드 타임아웃을 120초로 설정
+    driver.implicitly_wait(60)  # 암묵적 대기 시간을 60초로 설정
     
     return driver
 
