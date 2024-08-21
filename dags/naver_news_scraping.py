@@ -16,8 +16,8 @@ def init_driver(**kwargs):
     # remote_chromedriver 컨테이너에 연결
     remote_webdriver = 'http://remote_chromedriver:4444/wd/hub'
     driver = webdriver.Remote(remote_webdriver, options=options)
-    driver.set_page_load_timeout(120)  # 페이지 로드 타임아웃을 120초로 설정
-    driver.implicitly_wait(60)  # 암묵적 대기 시간을 60초로 설정
+    driver.set_page_load_timeout(60)  # 페이지 로드 타임아웃 설정 (60초)
+    driver.implicitly_wait(30)  # 암묵적 대기 설정 (30초)
     
     return driver
 
@@ -40,21 +40,20 @@ def naver_news_etl():
     def scrape_naver_news():
         driver = init_driver()
 
-        # 구글 뉴스 페이지 열기
+        # 네이버 뉴스 페이지 열기
         driver.get('https://news.naver.com/')
         news_data = []
+
         # 뉴스 제목 추출
-        titles =  []
         for i in range(1, 6):
-            title = driver.find_elements(By.XPATH, f'//*[@id="_SECTION_HEADLINE_LIST_rvr5l"]/li[{i}]/div/div/div[2]/a/strong')
-            titles.append(title)
-        
-        news_data = []
-        for title in titles:
-            title_text = title.text
-            title_link = title.get_attribute('href')
-            news_data.append({'title': title_text, 'link': title_link})
-            print(f"Title: {title_text}, Link: {title_link}")
+            title_elements = driver.find_elements(By.XPATH, f'//*[@id="_SECTION_HEADLINE_LIST_rvr5l"]/li[{i}]/div/div/div[2]/a/strong')
+            
+            # title_elements는 리스트이므로, 각 요소에 접근하여 처리
+            for title in title_elements:
+                title_text = title.text
+                title_link = title.get_attribute('href')
+                news_data.append({'title': title_text, 'link': title_link})
+                print(f"Title: {title_text}, Link: {title_link}")
 
         # WebDriver 종료
         driver.quit()
