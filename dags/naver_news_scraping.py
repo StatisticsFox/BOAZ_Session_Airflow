@@ -74,7 +74,7 @@ def naver_news_etl():
     @task
     def output_top_10(news_data):
         print("Top 10 News:")
-        for i, news in enumerate(news_data[:10]):
+        for i, news in enumerate(news_data[:5]):
             print(f"{i + 1}. Title: {news['title']}, Link: {news['link']}")
 
     # Task 연결
